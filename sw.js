@@ -1,7 +1,7 @@
 /* 千葉 サーキットタイマー — オフライン用（10/17）
    CACHE の値はビルドのたびに中身から自動生成される。手で上げる必要はない。
    ページ（index・entry・callback）はネットを先に見て、つながらないときだけ保存した版を出す。 */
-const CACHE  = 'chiba-timer-4fe1878eef';
+const CACHE  = 'chiba-timer-f162ca808e';
 const PAGES  = ['index.html', 'entry.html', 'callback.html'];
 const ASSETS = [...PAGES, 'manifest.json', 'entry-manifest.json', 'icon-192.png', 'icon-512.png'];
 
