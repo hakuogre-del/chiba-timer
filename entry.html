@@ -1,0 +1,99 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow,noarchive"><meta name="theme-color" content="#080c10">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="名前入力">
+<link rel="manifest" href="entry-manifest.json"><link rel="apple-touch-icon" href="icon-192.png"><link rel="icon" href="icon-192.png">
+<title>次のレッスン 名前入力</title>
+<style>
+/* 外のタブレット用：次のレッスンの名前を入れるだけの画面（10/17） */
+:root{color-scheme:dark;--blue:#0090d0;--gold:#bf9000}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:#080c10;color:#fff;font-family:'Yu Gothic','YuGothic','Hiragino Sans',sans-serif;display:flex;flex-direction:column;
+ padding:max(14px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(14px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+button,input{font:inherit;color:inherit}
+header{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:6px}
+header b{font-size:clamp(13px,1.4vw,18px);letter-spacing:.08em;color:#9fb0bd}
+h1{margin:0;font-size:clamp(24px,3.4vw,46px);font-weight:800}
+h1 small{font-size:.5em;font-weight:700;color:#bf9000;margin-left:.6em}
+.lead{margin:2px 0 12px;font-size:clamp(14px,1.6vw,22px);color:#cfd8de}
+#state{margin-left:auto;font-size:13px;color:#9fb0bd}
+#state[data-s=ok]{color:#7fd99a}#state[data-s=off],#state[data-s=ng]{color:#ffb84d}
+#grid{flex:1;min-height:0;display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:1fr;gap:clamp(8px,1.2vw,16px)}
+.slot{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:4px;text-align:left;
+ padding:clamp(10px,1.4vw,20px);border-radius:14px;border:2px solid #33414c;background:#101a22;cursor:pointer;min-height:84px}
+.slot .top{display:flex;align-items:center;gap:10px;width:100%}
+.slot i{font-style:normal;font-weight:800;display:inline-flex;align-items:center;justify-content:center;flex:none;
+ width:clamp(34px,3.4vw,50px);height:clamp(34px,3.4vw,50px);border-radius:50%;border:2px solid #e9eef2;font-size:clamp(17px,1.8vw,26px)}
+.slot.run i{border-color:#3d8bff;color:#7db4ff}
+.slot .st{font-weight:700;font-size:clamp(14px,1.5vw,21px);color:#cfd8de}
+.slot .nm{font-weight:800;font-size:clamp(20px,2.4vw,34px);line-height:1.2;word-break:break-all}
+.slot.free .nm{color:#7fd4ff;font-size:clamp(15px,1.7vw,24px)}
+.slot.taken{border-color:#bf9000;background:#1d1a10}
+.slot:active{transform:scale(.98)}
+@media(orientation:portrait){#grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:560px){#grid{grid-template-columns:repeat(2,1fr)}}
+dialog{border:1px solid #65727c;border-radius:16px;background:#0e171f;color:#fff;width:min(560px,94vw);padding:22px 22px 18px}
+dialog::backdrop{background:rgba(0,0,0,.7)}
+dialog h2{margin:0 0 4px;font-size:26px}
+dialog p{margin:4px 0 12px;color:#cfd8de}
+#nm{width:100%;padding:14px;font-size:26px;border-radius:10px;border:1px solid #65727c;background:#0b141c}
+.btns{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.btns button{flex:1;padding:14px 10px;font-size:19px;font-weight:800;border-radius:10px;border:1px solid #65727c;background:#18232c;cursor:pointer}
+.btns .ok{background:#0090d0;border-color:#0090d0}
+#toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#bf9000;color:#111;font-weight:800;padding:12px 20px;border-radius:999px;display:none;z-index:9;font-size:18px;text-align:center;max-width:92vw}
+#cover{white-space:pre-line;position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(8,12,16,.92);z-index:8;padding:24px;text-align:center;font-size:clamp(18px,2.4vw,30px);line-height:1.7}
+</style></head><body>
+<header><b>HYROX TRAINING CLUB　千葉店</b><span id="state">接続を確認しています…</span></header>
+<h1>次のレッスンの名前入力<small id="count"></small></h1>
+<p class="lead">スタートする番号を選んで、名前（ニックネーム）を入れてください。レッスン中、スタジオの画面に表示されます。</p>
+<div id="grid"></div>
+<dialog id="dlg"><h2 id="dlgT"></h2><p id="dlgL">名前（ニックネーム）を入れてください。</p>
+<input id="nm" maxlength="16" autocomplete="off" placeholder="名前">
+<div class="btns"><button class="ok" id="ok">決定</button><button id="del">消す</button><button id="cancel">キャンセル</button></div></dialog>
+<div id="cover"></div><div id="toast" role="status"></div>
+<script>
+const SB_URL='https://hsdytoabyuzsspyrnhgc.supabase.co',SB_KEY='sb_publishable_Di3G2heOiX-x3-S2n-rC_Q_oJvOOa0-',STORE='chiba',PASS_KEY='hx-chiba-entry-pass-v1';
+const LABELS=['バイク','スキーエルゴ','スレッドプッシュ','ラン','スレッドプル','バーピー','ラン','ローイング','ファーマーズ','ラン','ランジ','ウォールボール'];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let pass='',data=null,busy=false,openSlot=-1,openSeq=null,lastCur=null,fails=0;
+try{const m=location.hash.match(/[#&]k=([0-9a-f]{8,64})/i);if(m){localStorage.setItem(PASS_KEY,m[1]);history.replaceState(null,'',location.pathname+location.search)}}catch(e){}
+try{pass=localStorage.getItem(PASS_KEY)||''}catch(e){}
+function toast(s){$('toast').textContent=s;$('toast').style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>$('toast').style.display='none',4500)}
+function cover(s){$('cover').textContent=s||'';$('cover').style.display=s?'flex':'none'}
+async function rpc(fn,args){const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),8000);
+ try{const r=await fetch(SB_URL+'/rest/v1/rpc/'+fn,{method:'POST',cache:'no-store',signal:ctl.signal,
+   headers:{apikey:SB_KEY,'Content-Type':'application/json'},body:JSON.stringify({p_store:STORE,p_pass:pass,...args})});
+  const j=await r.json().catch(()=>null);if(!r.ok){const e=Error((j&&j.message)||('HTTP '+r.status));e.server=true;throw e}return j}
+ finally{clearTimeout(t)}}
+function names(){const p=data&&data.pages&&data.pages[data.cur+1];return Array.from({length:12},(_,i)=>String((p&&p[i])||''))}
+function state(s,t){$('state').dataset.s=s;$('state').textContent=t}
+function render(){const n=names(),c=n.filter(x=>x.trim()).length;
+ $('count').textContent=c+' / 12人';
+ $('grid').innerHTML=n.map((nm,k)=>`<button class="slot ${nm.trim()?'taken':'free'}${LABELS[k]==='ラン'?' run':''}" data-k="${k}"><span class="top"><i>${k+1}</i><span class="st">${LABELS[k]}</span></span><span class="nm">${nm.trim()?esc(nm):'＋ 名前を入れる'}</span></button>`).join('')}
+function take(j){if(!j||!Number.isInteger(j.cur)||!j.pages)return;
+ if(lastCur!==null&&j.cur!==lastCur){if($('dlg').open)$('dlg').close();toast('レッスンが始まりました。次のレッスンの受付に切り替わりました。')}
+ lastCur=j.cur;data=j;fails=0;state('ok','つながっています');cover('');render()}
+async function poll(){if(busy||document.hidden)return;if(!pass){cover('この画面はまだ設定されていません。スタッフにお知らせください。');return}
+ busy=true;try{take(await rpc('tn_get',{}))}catch(e){
+  if(e.server&&/denied/.test(e.message)){state('ng','合言葉が違います');cover('この画面は使えない状態です。スタッフにお知らせください。')}
+  else{fails++;state('off','ネットにつながっていません');if(fails>=3)cover('ネットにつながっていません。\nスタジオの中のタブレットで名前を入れてもらってください。')}}
+ finally{busy=false}}
+setInterval(poll,3000);poll();
+window.addEventListener('online',poll);document.addEventListener('visibilitychange',poll);
+$('grid').addEventListener('click',e=>{const b=e.target.closest('.slot');if(!b||!data)return;openSlot=+b.dataset.k;openSeq=data.cur+1;
+ const cur=names()[openSlot].trim();$('dlgT').textContent=(openSlot+1)+'　'+LABELS[openSlot];
+ $('dlgL').textContent=cur?'この番号には「'+cur+'」さんが入っています。変えるときは入れ直してください。':'名前（ニックネーム）を入れてください。';
+ $('nm').value=cur;$('del').hidden=!cur;$('dlg').showModal();setTimeout(()=>$('nm').focus(),60)});
+async function save(v){if(openSlot<0)return;const slot=openSlot,seq=openSeq;$('dlg').close();
+ try{busy=true;take(await rpc('tn_set',{p_seq:seq,p_slot:slot,p_name:v.trim().slice(0,16)}));toast(v.trim()?(slot+1)+'番に「'+v.trim()+'」さんを入れました':(slot+1)+'番を空けました')}
+ catch(e){toast(e.server&&/closed/.test(e.message)?'このレッスンの受付は終わりました。もう一度選んでください。':'保存できませんでした。もう一度お試しください。')}
+ finally{busy=false;poll()}}
+$('ok').onclick=()=>save($('nm').value);
+$('del').onclick=()=>save('');
+$('cancel').onclick=()=>$('dlg').close();
+$('nm').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();save($('nm').value)}});
+if('serviceWorker'in navigator&&window.isSecureContext)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script></body></html>

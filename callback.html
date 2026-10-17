@@ -1,0 +1,32 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive"><title>Spotify</title></head>
+<body style="font:16px/1.9 'Hiragino Sans','Yu Gothic',sans-serif;background:#080c10;color:#fff;margin:0;padding:2.4em 1.6em">
+<p id="m">Spotifyの確認をしています…</p>
+<p id="b" hidden><a href="./" style="color:#7fd4ff">タイマーの画面に戻る</a></p>
+<script>
+(function(){
+  var q = new URLSearchParams(location.search);
+  var msg = { hyroxSpotify: 1, code: q.get('code'), state: q.get('state'), error: q.get('error') };
+  var m = document.getElementById('m');
+  try {
+    if (window.opener && !window.opener.closed) {
+      window.opener.postMessage(msg, location.origin);
+      m.textContent = '確認できました。この画面は自動で閉じます。';
+      setTimeout(function(){ try { window.close() } catch (e) {} }, 500);
+      return;
+    }
+  } catch (e) {}
+  /* 同じ画面でログインしてきた場合：結果を置いてタイマーに戻る */
+  try {
+    if (msg.code || msg.error) {
+      localStorage.setItem('hyrox-sp-cb', JSON.stringify(msg));
+      m.textContent = 'タイマーの画面に戻ります…';
+      location.replace('./');
+      return;
+    }
+  } catch (e) {}
+  m.textContent = 'タイマーの画面に戻って、もう一度「Spotifyにつなぐ」を押してください。';
+  document.getElementById('b').hidden = false;
+})();
+</script></body></html>

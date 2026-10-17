@@ -1,0 +1,31 @@
+{
+  "name": "次のレッスン 名前入力",
+  "short_name": "名前入力",
+  "description": "千葉店 次のレッスンの名前入力（外のタブレット用）",
+  "start_url": "entry.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#05090C",
+  "theme_color": "#05090C",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
