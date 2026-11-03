@@ -1,4 +1,4 @@
-const CACHE='hyrox60-lastwork-20261103-v1';
+const CACHE='hyrox60-lastwork-20261103-v2';
 const FILES=['./','./index.html','./app-template.txt','./manifest.json','../index.html','../icon-192.png','../icon-512.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('hyrox60-lastwork-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
