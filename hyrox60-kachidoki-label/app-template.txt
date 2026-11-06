@@ -40,7 +40,7 @@ body.ringmode main{flex:1;min-height:0;height:auto!important;display:grid!import
 body.ringmode .timer{pointer-events:none}
 body.ringmode .timer button{pointer-events:auto}
 .rnode,.rlabel,.rname{pointer-events:auto;cursor:pointer}
-.rlabel{font-size:clamp(12px,1.85vw,36px)!important}
+.rlabel{font-size:clamp(12px,1.85vw,36px)!important}.rlabel.long-cardio{font-size:clamp(10px,1.05vw,18px)!important}
 .rname{font-size:clamp(12px,1.6vw,30px)!important}
 .rname.empty{background:transparent;color:#ffe500;border:2px dashed #ffe50099;box-shadow:none;font-size:clamp(11px,1.15vw,20px)!important;padding:.05em .55em}
 #nameOne{width:min(460px,92vw)}
@@ -385,7 +385,7 @@ function ringBuild(G){const r=$('ring');Object.assign(r.style,{left:G.m.left+'px
   a+=`<polygon points="${x+ux*sz},${y+uy*sz} ${x-ux*sz*.6-uy*sz*.7},${y-uy*sz*.6+ux*sz*.7} ${x-ux*sz*.6+uy*sz*.7},${y-uy*sz*.6-ux*sz*.7}" fill="#3d8bff"/>`}
  svg.innerHTML=`<ellipse cx="${G.cx}" cy="${G.cy}" rx="${G.rx}" ry="${G.ry}" fill="none" stroke="#dfe7ee" stroke-width="3" stroke-dasharray="12 10" opacity=".85"/>`+a;
  const lh=parseFloat(getComputedStyle(document.body).fontSize);
- $('ringNodes').innerHTML=G.pts.map(p=>`<div class="rnode${(RING_LABELS[p.k]==='ラン'||RING_LABELS[p.k].startsWith('有酸素'))?' run':''}" data-k="${p.k}" style="left:${p.x}px;top:${p.y}px;width:${G.d}px;height:${G.d}px;font-size:${G.d*0.46}px">${p.k+1}</div><div class="rlabel${(RING_LABELS[p.k]==='ラン'||RING_LABELS[p.k].startsWith('有酸素'))?' run':''}" data-k="${p.k}">${RING_LABELS[p.k]}</div>`).join('');
+ $('ringNodes').innerHTML=G.pts.map(p=>`<div class="rnode${(RING_LABELS[p.k]==='ラン'||RING_LABELS[p.k].startsWith('有酸素'))?' run':''}" data-k="${p.k}" style="left:${p.x}px;top:${p.y}px;width:${G.d}px;height:${G.d}px;font-size:${G.d*0.46}px">${p.k+1}</div><div class="rlabel${((p.k===3||p.k===9)&&RING_LABELS[p.k].startsWith('有酸素'))?' long-cardio':''}${(RING_LABELS[p.k]==='ラン'||RING_LABELS[p.k].startsWith('有酸素'))?' run':''}" data-k="${p.k}">${RING_LABELS[p.k]}</div>`).join('');
  $('ringNames').innerHTML=Array.from({length:12},(_,s)=>`<div class="rname" data-s="${s}"></div>`).join('')}
 function nameOffset(){return round+(!M.clock24&&!done&&left<=30000&&round<roundCount()-1?1:0)}
 function ringRender(force){
@@ -597,4 +597,4 @@ const bin=atob('__PUBLIC_VIDEO__');let bytes=new Uint8Array(bin.length);for(let 
 $('video').src=URL.createObjectURL(new Blob([bytes],{type:'video/mp4'}));bytes=null;
 applyMode();playVideo();
 try{const k=localStorage.getItem(LASTMODE);if(k&&MODES[k]){const b=document.querySelector('.modebtn[data-mode="'+k+'"]');if(b)b.autofocus=true}}catch(e){}
-</script><div id="offlineStatus" role="status" style="position:fixed;bottom:6px;left:6px;z-index:200;background:#122431;color:white;padding:7px 10px;border-radius:4px;font:14px sans-serif">オフライン保存を準備中…</div><script>(async()=>{const el=document.getElementById('offlineStatus');try{if(!('serviceWorker'in navigator)||!window.isSecureContext)throw Error('非対応');const parent=window.parent,base=parent.location.href;const registration=await parent.navigator.serviceWorker.register(new URL('./sw.js',base).href);await parent.navigator.serviceWorker.ready;const cache=await parent.caches.open('hyrox60-kachidoki-label-20261106-v1');if(!await cache.match(new URL('./app-template.txt',base).href)||!await cache.match(new URL('../index.html',base).href))throw Error('保存未完了');el.textContent='オフライン保存完了';setTimeout(()=>el.style.display='none',6000)}catch(e){el.textContent='オフライン保存を確認できません。通信を確認して開き直してください。'}})();</script></body></html>
+</script><div id="offlineStatus" role="status" style="position:fixed;bottom:6px;left:6px;z-index:200;background:#122431;color:white;padding:7px 10px;border-radius:4px;font:14px sans-serif">オフライン保存を準備中…</div><script>(async()=>{const el=document.getElementById('offlineStatus');try{if(!('serviceWorker'in navigator)||!window.isSecureContext)throw Error('非対応');const parent=window.parent,base=parent.location.href;const registration=await parent.navigator.serviceWorker.register(new URL('./sw.js',base).href);await parent.navigator.serviceWorker.ready;const cache=await parent.caches.open('hyrox60-kachidoki-label-20261106-v2');if(!await cache.match(new URL('./app-template.txt',base).href)||!await cache.match(new URL('../index.html',base).href))throw Error('保存未完了');el.textContent='オフライン保存完了';setTimeout(()=>el.style.display='none',6000)}catch(e){el.textContent='オフライン保存を確認できません。通信を確認して開き直してください。'}})();</script></body></html>
